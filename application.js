@@ -32,6 +32,26 @@ var svg = d3.select('svg');
 var typeGroups = {};
 var typeIndex = 0;
 
+var imgs = {
+  "attack-patterns": "attack_pattern",
+  "bundles": "bundle",
+  "campaigns": "campaign",
+  "courses-of-action": "course_of_action",
+  "identities": "identity",
+  "incidents": "incident",
+  "indicators": "indicator",
+  "infrastructures": "infrastructure",
+  "malwares": "malware",
+  "observed-data": "observed_data",
+  "relationships": "relationship",
+  "reports": "report",
+  "sightings": "sighting",
+  "threat-actors": "threat_actor",
+  "tools": "tool",
+  "victims": "victim",
+  "victim-targets": "victim_target"
+}
+
 var currentGraph = {
   nodes: [],
   edges: []
@@ -167,6 +187,19 @@ function initGraph() {
       .attr("in", "SourceGraphic")
       .attr("in2", "blurOut")
       .attr("mode", "normal");
+
+  defs.selectAll('pattern')
+      .data(getValues(imgs))
+    .enter().append('pattern')
+      .attr('id', function(d, i) { return d + "_icon"; })
+      .attr('height', '100%')
+      .attr('width', '100%')
+      .attr('patternContentUnits', 'objectBoundingBox')
+    .append('svg:image')
+      .attr('height', '1')
+      .attr('width', '1')
+      .attr('preserveAspectRatio', 'none')
+      .attr("xlink:href", function(d) { return getImgUrl(d); })
 
   // Adds style directly because it wasn't getting picked up by the style sheet
   var link = svg.selectAll('path.link').data(currentGraph.edges).enter().append('path')
@@ -338,6 +371,26 @@ function handleSelected(d, el) {
 function handlePin(d, el, pinBool) {
   d.fixed = pinBool;
   d3.select(el).classed("pinned", pinBool);
+}
+
+/* ******************************************************
+ * Returns the icon URL for a given string.
+ * (Assumes the string represents a valid STIX item)
+ * ******************************************************/
+function getImgUrl(item) {
+  var imgBaseString = "icons/stix2_$_icon_300dpi_v1.png";
+  return imgBaseString.replace('$', item);
+}
+
+/* ******************************************************
+ * Returns an array consisting of an object's values.
+ * ******************************************************/
+function getValues(obj) {
+  var result = [];
+  for (key in obj) {
+    result.push(obj[key]);
+  }
+  return result;
 }
 
 /* ******************************************************
