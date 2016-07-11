@@ -5,8 +5,8 @@
 // Config
 var d3Config = {
   color: d3.scale.category20(),
-  nodeSize: 10,
-  linkMultiplier: 20
+  nodeSize: 25,//10;
+  linkMultiplier: 10//20
 }
 
 // Init some stuff
@@ -31,26 +31,6 @@ var labelForce = d3.layout.force().gravity(0).linkDistance(25).linkStrength(8).c
 var svg = d3.select('svg');
 var typeGroups = {};
 var typeIndex = 0;
-
-var imgs = {
-  "attack-patterns": "attack_pattern",
-  "bundles": "bundle",
-  "campaigns": "campaign",
-  "courses-of-action": "course_of_action",
-  "identities": "identity",
-  "incidents": "incident",
-  "indicators": "indicator",
-  "infrastructures": "infrastructure",
-  "malwares": "malware",
-  "observed-data": "observed_data",
-  "relationships": "relationship",
-  "reports": "report",
-  "sightings": "sighting",
-  "threat-actors": "threat_actor",
-  "tools": "tool",
-  "victims": "victim",
-  "victim-targets": "victim_target"
-}
 
 var currentGraph = {
   nodes: [],
@@ -188,8 +168,9 @@ function initGraph() {
       .attr("in2", "blurOut")
       .attr("mode", "normal");
 
+  // Add pattern elements containing the icons for the various TLOs
   defs.selectAll('pattern')
-      .data(getValues(imgs))
+      .data(Object.keys(typeGroups)) // only build patterns for types present
     .enter().append('pattern')
       .attr('id', function(d, i) { return d + "_icon"; })
       .attr('height', '100%')
@@ -231,7 +212,7 @@ function initGraph() {
     .enter().append("circle")
       .attr("class", "node")
       .attr("r", d3Config.nodeSize)
-      .style("fill", function(d) { return d3Config.color(d.typeGroup); })
+      .style("fill", function(d) { return getPatternUrl(d); })
       .call(force.drag); // <-- What does the "call()" function do?
   node.on('click', function(d, i) { handleSelected(d, this) }); // If they're holding shift, release
 
@@ -379,7 +360,7 @@ function handlePin(d, el, pinBool) {
  * ******************************************************/
 function getImgUrl(item) {
   var imgBaseString = "icons/stix2_$_icon_300dpi_v1.png";
-  return imgBaseString.replace('$', item);
+  return imgBaseString.replace('$', item).replace('-', '_');
 }
 
 /* ******************************************************
@@ -391,6 +372,14 @@ function getValues(obj) {
     result.push(obj[key]);
   }
   return result;
+}
+
+function getPatternUrl(item) {
+  if (item.type === 'information-source') {
+    return d3Config.color(item.typeGroup);
+  } else {
+    return "url(#" + item.type + "_icon)";
+  }
 }
 
 /* ******************************************************
