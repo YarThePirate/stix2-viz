@@ -117,6 +117,7 @@ function addToGraph(package) {
   header.classList.add('linkish');
 
   buildNodes(package);
+  buildLegend();
   initGraph();
 }
 
@@ -368,17 +369,6 @@ function getImgUrl(item) {
 }
 
 /* ******************************************************
- * Returns an array consisting of an object's values.
- * ******************************************************/
-function getValues(obj) {
-  var result = [];
-  for (key in obj) {
-    result.push(obj[key]);
-  }
-  return result;
-}
-
-/* ******************************************************
  * Returns the URL for the SVG element containing the
  * icon for a given type of TLO.
  * 
@@ -390,6 +380,35 @@ function getPatternUrl(item) {
   } else {
     return "url(#" + item.type + "_icon)";
   }
+}
+
+/* ******************************************************
+ * Returns an array consisting of an object's values.
+ * ******************************************************/
+function getValues(obj) {
+  var result = [];
+  for (key in obj) {
+    result.push(obj[key]);
+  }
+  return result;
+}
+
+/* ******************************************************
+ * Builds the legend in the sidebar from whatever nodes
+ * are present
+ * ******************************************************/
+function buildLegend() {
+  var ul = document.getElementById('legend-content');
+  Object.keys(typeGroups).forEach(function(typeName) {
+    var li = document.createElement('li');
+    var val = document.createElement('p');
+    var key = document.createElement('div');
+    key.style.backgroundColor = d3Config.color(typeGroups[typeName]);
+    val.innerText = typeName;
+    li.appendChild(key);
+    li.appendChild(val);
+    ul.appendChild(li);
+  });
 }
 
 /* ******************************************************
@@ -411,20 +430,26 @@ function buildNodes(package) {
     }
   });
 
-  addRelationships(relationships);
+  buildRelationships(relationships);
+}
 
-  // Add the legend so we know what's what
-  var ul = document.getElementById('legend-content');
-  Object.keys(typeGroups).forEach(function(typeName) {
-    var li = document.createElement('li');
-    var val = document.createElement('p');
-    var key = document.createElement('div');
-    key.style.backgroundColor = d3Config.color(typeGroups[typeName]);
-    val.innerText = typeName;
-    li.appendChild(key);
-    li.appendChild(val);
-    ul.appendChild(li);
-  });
+/* ******************************************************
+ * Adds relationships to the graph based on the array of
+ * relationships contained in the data.
+ * 
+ * Takes an array as input.
+ * ******************************************************/
+function buildRelationships(relationships) {
+  for(var i = 0; i < relationships.length; i++) {
+    var rel = relationships[i];
+    if(idCache[rel.source_ref] === null || idCache[rel.source_ref] === undefined) {
+      console.error("Couldn't find source!", rel);
+    } else if (idCache[rel.target_ref] === null || idCache[rel.target_ref] === undefined) {
+      console.error("Couldn't find target!", rel);
+    } else {
+      currentGraph.edges.push({source: idCache[rel.source_ref], target: idCache[rel.target_ref], label: rel.value});
+    }
+  }
 }
 
 /* ******************************************************
@@ -484,25 +509,6 @@ function addTlo(tlo) {
 			target : (labelGraph.nodes.length - 1),
       weight: 1
 		});
-  }
-}
-
-/* ******************************************************
- * Adds relationships to the graph based on the array of
- * relationships contained in the data.
- * 
- * Takes an array as input.
- * ******************************************************/
-function addRelationships(relationships) {
-  for(var i = 0; i < relationships.length; i++) {
-    var rel = relationships[i];
-    if(idCache[rel.source_ref] === null || idCache[rel.source_ref] === undefined) {
-      console.error("Couldn't find source!", rel);
-    } else if (idCache[rel.target_ref] === null || idCache[rel.target_ref] === undefined) {
-      console.error("Couldn't find target!", rel);
-    } else {
-      currentGraph.edges.push({source: idCache[rel.source_ref], target: idCache[rel.target_ref], label: rel.value});
-    }
   }
 }
 
