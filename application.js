@@ -5,7 +5,7 @@
 // Config
 var d3Config = {
   color: d3.scale.category20(),
-  nodeSize: 25,//10;
+  nodeSize: 15,//10;
   linkMultiplier: 10//20
 }
 
@@ -363,7 +363,7 @@ function handlePin(d, el, pinBool) {
  * (Assumes the string represents a valid STIX item)
  * ******************************************************/
 function getImgUrl(item) {
-  var imgBaseString = "icons/stix2_$_icon_300dpi_v1.png";
+  var imgBaseString = "icons/stix2_$_icon_tiny_round_v1_fill.png";
   return imgBaseString.replace('$', item).replace('-', '_');
 }
 
@@ -378,6 +378,12 @@ function getValues(obj) {
   return result;
 }
 
+/* ******************************************************
+ * Returns the URL for the SVG element containing the
+ * icon for a given type of TLO.
+ * 
+ * Makes assumptions about the structure of the JSON data
+ * ******************************************************/
 function getPatternUrl(item) {
   if (item.type === 'information-source') {
     return d3Config.color(item.typeGroup);
@@ -532,6 +538,7 @@ function resetPage() {
     document.getElementById('canvas').innerHTML = ""; // empty the svg
     document.getElementById('files').value = ""; // reset the files input
     document.getElementById('chosen-files').innerHTML = ""; // reset the subheader text
+    document.getElementById('legend-content').innerHTML = ""; // reset the legend
 
     header.classList.remove('linkish');
   }
