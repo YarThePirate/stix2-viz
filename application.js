@@ -364,7 +364,9 @@ function handlePin(d, el, pinBool) {
  * (Assumes the string represents a valid STIX item)
  * ******************************************************/
 function getImgUrl(item) {
-  var imgBaseString = "icons/stix2_$_icon_tiny_round_v1_fill.png";
+  // Change this string to match the standard icon name.
+  // the '$' serves as the wildcard for the TLO type
+  var imgBaseString = "icons/stix2_$_icon_tiny_round_v1.png";
   return imgBaseString.replace('$', item).replace('-', '_');
 }
 
@@ -404,6 +406,7 @@ function buildLegend() {
     var val = document.createElement('p');
     var key = document.createElement('div');
     key.style.backgroundColor = d3Config.color(typeGroups[typeName]);
+    key.style.backgroundImage = "url('" + getImgUrl(typeName) + "')";
     val.innerText = typeName;
     li.appendChild(key);
     li.appendChild(val);

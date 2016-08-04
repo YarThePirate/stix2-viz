@@ -112,9 +112,11 @@ li {
 }
 
 ul li div {
-  width: 30px;
-  height: 12px;
+  width: 2em;
+  height: 2em;
   display: inline-block;
+  border-radius: 100%;
+  background-position: center;
 }
 
 ul > li > p {
